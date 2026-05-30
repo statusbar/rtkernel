@@ -1,0 +1,42 @@
+# Native host-arch Debian Trixie image that cross-compiles arm64 Linux
+# kernels using the standard ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
+# toolchain. On x86_64 hosts: gcc, make, dpkg-deb all run native amd64 —
+# no qemu in the loop — but the produced .deb is arm64.
+#
+# Used by build.sh on x86_64 hosts; see docs/X86_HOSTS.md.
+
+FROM docker.io/debian:trixie
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Multiarch :arm64 enabled so the :arm64 dev headers are installable.
+# bindeb-pkg runs dpkg-checkbuilddeps with host-arch=arm64; without the
+# :arm64 -dev packages it bails before the cross-compile even starts.
+# The amd64 variants are what HOSTCC actually links (objtool, sign-file,
+# kconfig); the :arm64 variants exist only to satisfy the dep check.
+RUN dpkg --add-architecture arm64 \
+ && apt-get update && apt-get install -y --no-install-recommends \
+      crossbuild-essential-arm64 \
+      build-essential \
+      bc \
+      bison \
+      flex \
+      libssl-dev libssl-dev:arm64 \
+      libelf-dev libelf-dev:arm64 \
+      libncurses-dev libncurses-dev:arm64 \
+      libdw-dev \
+      kmod \
+      cpio \
+      rsync \
+      ca-certificates \
+      git \
+      python3 \
+      perl \
+      dpkg-dev \
+      fakeroot \
+      debhelper \
+      lsb-release \
+      pahole \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /work

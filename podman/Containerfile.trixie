@@ -1,0 +1,31 @@
+# Native arm64 kernel-build environment.
+# On Apple Silicon / arm64 Linux this runs without emulation.
+# On x86_64 hosts it falls back to qemu-user; see docs/X86_HOSTS.md.
+
+FROM docker.io/arm64v8/debian:trixie
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential \
+      bc \
+      bison \
+      flex \
+      libssl-dev \
+      libelf-dev \
+      libncurses-dev \
+      kmod \
+      cpio \
+      rsync \
+      ca-certificates \
+      git \
+      python3 \
+      perl \
+      dpkg-dev \
+      fakeroot \
+      debhelper \
+      lsb-release \
+      pahole \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /work
