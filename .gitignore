@@ -1,0 +1,4 @@
+# Per-variant build outputs (.deb packages, manifests)
+/variants/*/out/
+
+.DS_Store
